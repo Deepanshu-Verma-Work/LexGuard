@@ -1,17 +1,35 @@
 #!/bin/bash
 set -e
 
-GREEN='\033[0;32m'
-RED='\033[0;31m'
-NC='\033[0m'
+echo "⚠️  WARNING: You are about to DESTROY the entire LexGuard environment."
+echo "This will delete all data in DynamoDB, S3, and remove all Lambda functions."
+read -p "Are you sure you want to proceed? (y/n) " -n 1 -r
+echo
+if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+    echo "Aborted."
+    exit 1
+fi
 
-echo -e "${RED}=== TEARING DOWN CASECHAT INFRASTRUCTURE ===${NC}"
-echo -e "This will delete all active services to stop billing."
+echo "--------------------------------------"
+echo "🧹 Cleaning up S3 Buckets (Required for Terraform Destroy)..."
 
-cd infra
-terraform init -no-color
-terraform destroy -auto-approve -no-color
+cd infra_serverless
+FRONTEND_BUCKET=$(terraform output -raw frontend_bucket 2>/dev/null || echo "")
+EVIDENCE_BUCKET=$(terraform output -raw evidence_bucket 2>/dev/null || echo "")
 
-echo -e "\n${GREEN}=== CLEANUP COMPLETE ===${NC}"
-echo -e "All EC2 instances, S3 buckets, and Lambdas have been deleted."
-echo -e "You are now cost-free until you run ./deploy_ami.sh again."
+if [ ! -z "$FRONTEND_BUCKET" ]; then
+    echo "Emptying Frontend Bucket: $FRONTEND_BUCKET"
+    aws s3 rm s3://$FRONTEND_BUCKET --recursive
+fi
+
+if [ ! -z "$EVIDENCE_BUCKET" ]; then
+    echo "Emptying Evidence Bucket: $EVIDENCE_BUCKET"
+    aws s3 rm s3://$EVIDENCE_BUCKET --recursive
+fi
+
+echo "--------------------------------------"
+echo "🔥 Destroying Infrastructure via Terraform..."
+terraform destroy -auto-approve
+
+echo "--------------------------------------"
+echo "✅ Destruction Complete. No further charges will be incurred."
