@@ -1,0 +1,5 @@
+boto3
+pinecone
+requests
+pypdf
+langchain-text-splitters
