@@ -131,24 +131,23 @@ resource "aws_amplify_app" "lexguard" {
   # Build settings
   build_spec = <<-EOT
     version: 1
-    applications:
-      - frontend:
-          phases:
-            preBuild:
-              commands:
-                - cd frontend
-                - npm install
-            build:
-              commands:
-                - echo "window.config = { API_URL: \"$API_URL\" };" > public/config.js
-                - npm run build
-          artifacts:
-            baseDirectory: frontend/dist
-            files:
-              - '**/*'
-          cache:
-            paths:
-              - node_modules/**/*
+    frontend:
+      phases:
+        preBuild:
+          commands:
+            - cd frontend
+            - npm install
+        build:
+          commands:
+            - echo "window.config = { API_URL: \"$API_URL\" };" > public/config.js
+            - npm run build
+      artifacts:
+        baseDirectory: frontend/dist
+        files:
+          - '**/*'
+      cache:
+        paths:
+          - frontend/node_modules/**/*
   EOT
 
   environment_variables = {
