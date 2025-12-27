@@ -128,18 +128,18 @@ resource "aws_amplify_app" "lexguard" {
   repository = "https://github.com/Deepanshu-Verma-Work/LexGuard"
   access_token = var.github_token
 
-  # Valid build settings (quoted to avoid YAML parser issues with colons)
+  # Simplified flat build settings using --prefix to avoid pathing/shell issues
   build_spec = <<-EOT
     version: 1
     frontend:
       phases:
         preBuild:
           commands:
-            - "cd frontend && npm install"
+            - "npm install --prefix frontend"
         build:
           commands:
-            - "cd frontend && sh generate_config.sh"
-            - "cd frontend && npm run build"
+            - "sh frontend/generate_config.sh"
+            - "npm run build --prefix frontend"
       artifacts:
         baseDirectory: frontend/dist
         files:

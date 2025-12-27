@@ -1,3 +1,3 @@
 #!/bin/bash
-echo "window.config = { API_URL: \"$API_URL\" };" > public/config.js
-echo "Generated public/config.js with API_URL: $API_URL"
+# Generate config.js for the frontend, ensuring the path is correct from the repo root
+echo "window.config = { API_URL: \"$API_URL\" };" > frontend/public/config.js
