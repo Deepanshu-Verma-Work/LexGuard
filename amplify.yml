@@ -1,17 +1,19 @@
 version: 1
+appRoot: frontend
 frontend:
   phases:
     preBuild:
       commands:
-        - cd frontend && npm install
+        - nvm use 20 || nvm install 20
+        - npm install
     build:
       commands:
-        - cd frontend && echo "window.config = { API_URL: \"$API_URL\" };" > public/config.js
-        - cd frontend && npm run build
+        - echo "window.config = { API_URL: \"$API_URL\" };" > public/config.js
+        - npm run build
   artifacts:
-    baseDirectory: frontend/dist
+    baseDirectory: dist
     files:
       - '**/*'
   cache:
     paths:
-      - frontend/node_modules/**/*
+      - node_modules/**/*
