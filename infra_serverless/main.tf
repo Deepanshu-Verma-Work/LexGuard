@@ -128,7 +128,8 @@ resource "aws_amplify_app" "lexguard" {
   repository = "https://github.com/Deepanshu-Verma-Work/LexGuard"
   access_token = var.github_token
 
-  # Build settings (using amplify.yml in repo root)
+  # Use amplify.yml from repo root
+  build_spec = null
 
   environment_variables = {
     API_URL = aws_apigatewayv2_api.gateway.api_endpoint
