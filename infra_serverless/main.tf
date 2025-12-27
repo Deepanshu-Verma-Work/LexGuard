@@ -128,7 +128,7 @@ resource "aws_amplify_app" "lexguard" {
   repository = "https://github.com/Deepanshu-Verma-Work/LexGuard"
   access_token = var.github_token
 
-  # Build settings (we can also use amplify.yml file in the repo)
+  # Build settings
   build_spec = <<-EOT
     version: 1
     applications:
@@ -152,7 +152,7 @@ resource "aws_amplify_app" "lexguard" {
   EOT
 
   environment_variables = {
-    API_URL = "https://${aws_apigatewayv2_api.gateway.id}.execute-api.us-east-1.amazonaws.com"
+    API_URL = aws_apigatewayv2_api.gateway.api_endpoint
   }
 }
 
@@ -356,4 +356,8 @@ output "evidence_bucket" {
 
 output "frontend_bucket" {
     value = aws_s3_bucket.frontend.bucket
+}
+
+output "amplify_url" {
+  value = "https://main.${aws_amplify_app.lexguard.default_domain}"
 }
