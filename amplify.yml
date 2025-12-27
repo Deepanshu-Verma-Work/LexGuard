@@ -3,11 +3,11 @@ frontend:
   phases:
     preBuild:
       commands:
-        - 'cd frontend && npm install'
+        - cd frontend && npm install
     build:
       commands:
-        - 'cd frontend && echo "window.config = { API_URL: \"$API_URL\" };" > public/config.js'
-        - 'cd frontend && npm run build'
+        - cd frontend && sh generate_config.sh
+        - cd frontend && npm run build
   artifacts:
     baseDirectory: frontend/dist
     files:
