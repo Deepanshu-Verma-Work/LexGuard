@@ -128,27 +128,7 @@ resource "aws_amplify_app" "lexguard" {
   repository = "https://github.com/Deepanshu-Verma-Work/LexGuard"
   access_token = var.github_token
 
-  # Build settings
-  build_spec = <<-EOT
-    version: 1
-    frontend:
-      phases:
-        preBuild:
-          commands:
-            - cd frontend
-            - npm install
-        build:
-          commands:
-            - echo "window.config = { API_URL: \"$API_URL\" };" > public/config.js
-            - npm run build
-      artifacts:
-        baseDirectory: frontend/dist
-        files:
-          - '**/*'
-      cache:
-        paths:
-          - frontend/node_modules/**/*
-  EOT
+  # Build settings (using amplify.yml in repo root)
 
   environment_variables = {
     API_URL = aws_apigatewayv2_api.gateway.api_endpoint
