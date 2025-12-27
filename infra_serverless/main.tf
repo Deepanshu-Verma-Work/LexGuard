@@ -122,6 +122,45 @@ resource "aws_s3_bucket_public_access_block" "frontend_public" {
   restrict_public_buckets = false
 }
 
+# 4. AWS AMPLIFY (Professional Hosting)
+resource "aws_amplify_app" "lexguard" {
+  name       = "lexguard-app"
+  repository = "https://github.com/Deepanshu-Verma-Work/LexGuard"
+  access_token = var.github_token
+
+  # Build settings (we can also use amplify.yml file in the repo)
+  build_spec = <<-EOT
+    version: 1
+    applications:
+      - frontend:
+          phases:
+            preBuild:
+              commands:
+                - cd frontend
+                - npm install
+            build:
+              commands:
+                - echo "window.config = { API_URL: \"$API_URL\" };" > public/config.js
+                - npm run build
+          artifacts:
+            baseDirectory: frontend/dist
+            files:
+              - '**/*'
+          cache:
+            paths:
+              - node_modules/**/*
+  EOT
+
+  environment_variables = {
+    API_URL = "https://${aws_apigatewayv2_api.gateway.id}.execute-api.us-east-1.amazonaws.com"
+  }
+}
+
+resource "aws_amplify_branch" "main" {
+  app_id      = aws_amplify_app.lexguard.id
+  branch_name = "main"
+}
+
 resource "aws_s3_bucket_policy" "frontend_policy" {
   bucket = aws_s3_bucket.frontend.id
   depends_on = [aws_s3_bucket_public_access_block.frontend_public]

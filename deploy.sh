@@ -12,9 +12,15 @@ terraform apply -auto-approve
 # Capture outputs
 FRONTEND_BUCKET=$(terraform output -raw frontend_bucket)
 WEBSITE_URL=$(terraform output -raw website_endpoint)
+API_ENDPOINT=$(terraform output -raw api_endpoint)
 cd ..
 
-# 2. Build Frontend
+# 2. Update Frontend Config
+echo "--------------------------------------"
+echo "⚙️  Updating Frontend Configuration..."
+echo "window.config = { API_URL: \"$API_ENDPOINT\" };" > frontend/public/config.js
+
+# 3. Build Frontend
 echo "--------------------------------------"
 echo "🎨 Building Frontend..."
 cd frontend
@@ -22,7 +28,7 @@ npm install
 npm run build
 cd ..
 
-# 3. Upload to S3
+# 4. Upload to S3
 echo "--------------------------------------"
 echo "☁️  Syncing to S3 Bucket: $FRONTEND_BUCKET"
 aws s3 sync frontend/dist s3://$FRONTEND_BUCKET --delete
